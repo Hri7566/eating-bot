@@ -1,0 +1,17 @@
+{
+  "name": "eating-bot",
+  "module": "src/index.ts",
+  "type": "module",
+  "devDependencies": {
+    "bun-types": "latest"
+  },
+  "peerDependencies": {
+    "typescript": "^5.0.0"
+  },
+  "dependencies": {
+    "@t3-oss/env-core": "^0.7.1",
+    "level": "^8.0.0",
+    "mppclone-client": "^1.1.3",
+    "zod": "^3.22.4"
+  }
+}
