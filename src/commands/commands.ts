@@ -24,7 +24,7 @@ export class Command {
     public usage: string,
     public callback: (
       msg: MPPChatMessage,
-      bot: Bot
+      bot: Bot | false
     ) => Promise<string | void> | string | void
   ) {
     commands.push(this);

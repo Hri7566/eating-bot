@@ -1,0 +1,4 @@
+mpp:
+  enabled: false
+console:
+  enabled: true

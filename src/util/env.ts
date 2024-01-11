@@ -5,7 +5,7 @@ export const env = createEnv({
   isServer: true,
   runtimeEnv: process.env,
   server: {
-    MPPCLONE_TOKEN: z.string(),
+    MPPCLONE_TOKEN: z.string().optional(),
   },
 });
 
