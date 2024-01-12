@@ -6,7 +6,7 @@ export function addLocations() {
     displayName: "Home",
     items: [],
     staticItems: [],
-    nearby: [],
+    nearby: ["sidewalk"],
   });
 
   addLocation({
@@ -20,6 +20,32 @@ export function addLocations() {
         displayName: "Bench",
       },
     ],
-    nearby: ["home"],
+    nearby: [],
+  });
+
+  addLocation({
+    id: "neighbor",
+    displayName: "Neighbor's house",
+    items: [
+      {
+        id: "lemon",
+        displayName: "Lemon",
+        count: 1,
+        hide: true,
+      },
+    ],
+    staticItems: [
+      {
+        id: "tree_lemon",
+        displayName: "Lemon Tree",
+        count: 1,
+      },
+      {
+        id: "couch",
+        displayName: "Couch",
+        count: 1,
+      },
+    ],
+    nearby: ["sidewalk"],
   });
 }

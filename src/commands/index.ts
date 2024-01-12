@@ -85,6 +85,15 @@ export function addCommands() {
     "Having enough of {CURR_LOCATION}, you travel to {LOCATION}.",
   ];
 
+  const cantGoAnswers = [
+    "There's no such thing as {ARGCAT}.",
+    "You can't go to {ARGCAT} because it doesn't exist.",
+    "There is no place called {ARGCAT} on your map.",
+    "You can't go somewhere that doesn't exist.",
+    "There is no such place as {ARGCAT}.",
+    "There is no place on your map that's called {ARGCAT}.",
+  ];
+
   new Command(
     ["go"],
     "Go somewhere nearby",
@@ -97,7 +106,10 @@ export function addCommands() {
       const wantToGoFuzzy = argcat;
 
       const wantToGo = findLocationFuzzy(wantToGoFuzzy);
-      if (!wantToGo) return `There's no such thing as ${wantToGoFuzzy}`;
+      if (!wantToGo)
+        return cantGoAnswers[Math.floor(Math.random() * cantGoAnswers.length)]
+          .split("{ARGCAT}")
+          .join(argcat);
 
       if (!isNearby(currentLocationId, wantToGo.id))
         return `That place isn't close enough, you should try to ${msg.usedPrefix}${msg.usedCommand.aliases[0]} somewhere ${msg.usedPrefix}nearby.`;

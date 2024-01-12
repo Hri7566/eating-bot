@@ -2,7 +2,9 @@ import { MPPChatMessage } from "../commands/commands";
 import { InventoryItem, getShortItemDetail } from "../data/inventory";
 import { Bot } from "../mpp/bot";
 
-export interface LocationalItem extends InventoryItem {}
+export interface LocationalItem extends InventoryItem {
+  hide?: true;
+}
 
 export interface Location {
   id: string;
@@ -77,11 +79,11 @@ export function getLocationItemDetails(locationId: string) {
   let itemDetails = [];
 
   for (const item of loc.staticItems) {
-    itemDetails.push(getShortItemDetail(item));
+    if (!item.hide) itemDetails.push(getShortItemDetail(item));
   }
 
   for (const item of loc.items) {
-    itemDetails.push(getShortItemDetail(item));
+    if (!item.hide) itemDetails.push(getShortItemDetail(item));
   }
 
   if (itemDetails.length <= 0) return "(nothing)";
