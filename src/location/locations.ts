@@ -87,5 +87,72 @@ export function getLocationItemDetails(locationId: string) {
   }
 
   if (itemDetails.length <= 0) return "(nothing)";
-  return itemDetails;
+  return itemDetails.join(", ");
+}
+
+export function findItemAtLocation(
+  locationId: string,
+  itemId: string
+): [boolean, LocationalItem | undefined] {
+  const loc = getLocationFromTable(locationId);
+
+  for (const item of loc.items) {
+    if (item.id == itemId) return [false, item];
+  }
+
+  for (const item of loc.staticItems) {
+    if (item.id == itemId) return [true, item];
+  }
+
+  return [false, undefined];
+}
+
+export function findItemAtLocationFuzzy(
+  locationId: string,
+  fuzzy: string
+): [boolean, LocationalItem | undefined] {
+  const loc = getLocationFromTable(locationId);
+
+  for (const item of loc.items) {
+    if (
+      item.id.toLowerCase().includes(fuzzy.toLowerCase()) ||
+      item.displayName.toLowerCase().includes(fuzzy.toLowerCase())
+    )
+      return [false, item];
+  }
+
+  for (const item of loc.staticItems) {
+    if (
+      item.id.toLowerCase().includes(fuzzy.toLowerCase()) ||
+      item.displayName.toLowerCase().includes(fuzzy.toLowerCase())
+    )
+      return [true, item];
+  }
+
+  return [false, undefined];
+}
+
+export function removeItemAtLocation(
+  locationId: string,
+  itemId: string,
+  count: number
+) {
+  const loc = getLocationFromTable(locationId);
+  if (!loc) return false;
+
+  const [isStatic, item] = findItemAtLocation(locationId, itemId);
+  if (isStatic) return false;
+  if (!item) return false;
+
+  if (count >= item.count) {
+    // Remove item entirely
+    loc.items.splice(loc.items.indexOf(item), 1);
+  } else {
+    // Just decrement
+    loc.items[loc.items.indexOf(item)].count -= count;
+  }
+
+  // TODO "Save" here? I haven't written the code for items to be persistent yet... maybe save JSON somewhere, and load that after locations are already loaded?
+
+  return true;
 }

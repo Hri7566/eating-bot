@@ -1,11 +1,20 @@
-import { getInventory, getInventoryDetails } from "../data/inventory";
-import { getLocation, setLocation } from "../data/location";
 import {
+  addItem,
+  getInventory,
+  getInventoryDetails,
+  getShortItemDetail,
+  setInventory,
+} from "../data/inventory";
+import { getLocation, setLocation } from "../data/location";
+import { bhvPick } from "../items/pick";
+import {
+  findItemAtLocationFuzzy,
   findLocationFuzzy,
   findNearby,
   getLocationFromTable,
   getLocationItemDetails,
   isNearby,
+  removeItemAtLocation,
 } from "../location/locations";
 import { Command, commands } from "./commands";
 
@@ -147,6 +156,114 @@ export function addCommands() {
     async (msg, bot) => {
       const locid = await getLocation(msg.p._id);
       return `You see: ${getLocationItemDetails(locid)}`;
+    }
+  );
+
+  const pickedAnswers = [
+    "You picked up {ITEM}.",
+    "You decided to pick up the {ITEM}.",
+    "After an elongated decision, you finally pick {ITEM}.",
+    "You picked up the {ITEM}.",
+    "You took the {ITEM}.",
+    "You take the {ITEM}.",
+    "You took the {ITEM} and put it in your pocket.",
+  ];
+
+  const cantPickAnswers = [
+    "You can't pick up {ITEM}.",
+    "There's no way to pick {ITEM} up.",
+    "Picking up {ITEM} is not possible.",
+    "With all your might, you try to pick up {ITEM}, yet it yields nothing.",
+    "You picked up " +
+      getShortItemDetail({
+        id: "nothing",
+        count: 2 + Math.floor(Math.random() * 7),
+        displayName: "Nothing",
+      }) +
+      ".",
+  ];
+
+  const noItemAnswers = [
+    "There is no {ARGCAT} here.",
+    "You look around, but you don't see {ARGCAT}.",
+    "You see no {ARGCAT}.",
+    "You see no {ARGCAT} here.",
+    "There is no {ARGCAT} in this location.",
+    "You picked up {ARGCAT}... or so you thought, as there is no {ARGCAT} here, and you cannot pick something up that doesn't exist.",
+    "Picking up {ARGCAT} appears to have yielded you nothing.",
+    "As you try to pick up {ARGCAT}, you realize what you are after appears to have disappeared from in front of your eyes.",
+    "There is no {ARGCAT} here.",
+    "In this location, there is no {ARGCAT}.",
+    "You picked up " +
+      getShortItemDetail({
+        id: "nothing",
+        count: 2 + Math.floor(Math.random() * 7),
+        displayName: "Nothing",
+      }) +
+      ".",
+    "You can't take {ARGCAT} with you.",
+    "You aren't able to take {ARGCAT} with you.",
+    "Taking {ARGCAT} with you requires that it exists first.",
+  ];
+
+  new Command(
+    ["pickup", "pick"],
+    "Pick an item up (or off a tree-shaped object).",
+    "pickup",
+    async (msg, bot) => {
+      const argcat = msg.args.slice(1).join(" ");
+      const locid = await getLocation(msg.p._id);
+      const [itemIsStatic, item] = findItemAtLocationFuzzy(locid, argcat);
+      const inv = await getInventory(msg.p._id);
+
+      if (!item) {
+        return noItemAnswers[Math.floor(Math.random() * noItemAnswers.length)]
+          .split("{ARGCAT}")
+          .join(argcat);
+      }
+
+      const pick = bhvPick.get(item.id);
+
+      if (typeof pick == "function") {
+        const [worked, out] = await pick(msg, bot);
+
+        if (worked) {
+          // Remove from location and give to user
+          removeItemAtLocation(locid, item.id, 1);
+
+          addItem(inv, {
+            id: item.id,
+            count: 1,
+            displayName: item.displayName,
+          });
+
+          setInventory(msg.p._id, inv);
+        }
+
+        if (!out) {
+          if (worked && !itemIsStatic) {
+            return pickedAnswers[
+              Math.floor(Math.random() * pickedAnswers.length)
+            ]
+              .split("{ITEM}")
+              .join(getShortItemDetail(item));
+          } else {
+            return cantPickAnswers[
+              Math.floor(Math.random() * cantPickAnswers.length)
+            ]
+              .split("{ITEM}")
+              .join(getShortItemDetail(item));
+          }
+        } else {
+          return out;
+        }
+      } else {
+        return cantPickAnswers[
+          Math.floor(Math.random() * cantPickAnswers.length)
+        ]
+          .split("{ITEM}")
+          .join(getShortItemDetail(item));
+      }
     }
   );
 }

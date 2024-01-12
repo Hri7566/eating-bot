@@ -3,8 +3,11 @@ import {
   Inventory,
   addItem,
   deleteInventory,
+  findItem,
+  findItemFuzzy,
   getInventory,
   getInventoryDetails,
+  getItemCount,
   getShortItemDetail,
   removeItem,
   setInventory,
@@ -192,4 +195,96 @@ test("inventory details matches format", () => {
   });
 
   expect(details2).toBe("Items: (none)");
+});
+
+test("finding item in an inventory", () => {
+  const id1 = "happy";
+  const count1 = 1;
+  const displayName1 = "Happy";
+
+  const id2 = "sad";
+  const count2 = 2;
+  const displayName2 = "Sad";
+
+  const inv: Inventory = {
+    _id: "test",
+    items: [
+      {
+        id: id1,
+        count: count1,
+        displayName: displayName1,
+      },
+      {
+        id: id2,
+        count: count2,
+        displayName: displayName2,
+      },
+    ],
+  };
+
+  const item1 = findItem(inv, id1);
+  expect(item1).toBeDefined();
+  expect(item1?.id).toBe(id1);
+  expect(item1?.count).toBe(count1);
+  expect(item1?.displayName).toBe(displayName1);
+
+  const item2 = findItem(inv, id2);
+  expect(item2).toBeDefined();
+  expect(item2?.id).toBe(id2);
+  expect(item2?.count).toBe(count2);
+  expect(item2?.displayName).toBe(displayName2);
+});
+
+test("fuzzy finding item in an inventory", () => {
+  const id1 = "happy";
+  const count1 = 1;
+  const displayName1 = "Happy";
+  const fuzzy1 = "hap";
+
+  const id2 = "sad";
+  const count2 = 2;
+  const displayName2 = "Sad";
+  const fuzzy2 = "sa";
+
+  const inv: Inventory = {
+    _id: "test",
+    items: [
+      {
+        id: id1,
+        count: count1,
+        displayName: displayName1,
+      },
+      {
+        id: id2,
+        count: count2,
+        displayName: displayName2,
+      },
+    ],
+  };
+
+  const item1 = findItemFuzzy(inv, fuzzy1);
+  expect(item1).toBeDefined();
+  expect(item1?.id).toBe(id1);
+  expect(item1?.count).toBe(count1);
+  expect(item1?.displayName).toBe(displayName1);
+
+  const item2 = findItemFuzzy(inv, fuzzy2);
+  expect(item2).toBeDefined();
+  expect(item2?.id).toBe(id2);
+  expect(item2?.count).toBe(count2);
+  expect(item2?.displayName).toBe(displayName2);
+});
+
+test("get count of item in inventory", () => {
+  const id = "death_laser";
+  const displayName = "Death Laser";
+  const count = 9001;
+
+  const inv: Inventory = {
+    _id: "test",
+    items: [{ id, displayName, count }],
+  };
+
+  const fetchedCount = getItemCount(inv, id);
+  expect(fetchedCount).toBe(count);
 });

@@ -116,3 +116,29 @@ export function getInventoryDetails(inventory: Inventory) {
       : "(none)")
   );
 }
+
+export function findItem(inventory: Inventory, itemId: string) {
+  for (const item of inventory.items) {
+    if (item.id == itemId) {
+      return item;
+    }
+  }
+}
+
+export function findItemFuzzy(inventory: Inventory, fuzzy: string) {
+  for (const item of inventory.items) {
+    // Check both item.id and item.displayName for whatever we're looking for
+    if (
+      item.id.toLowerCase().includes(fuzzy.toLowerCase()) ||
+      item.displayName.toLowerCase().includes(fuzzy.toLowerCase())
+    ) {
+      return item;
+    }
+  }
+}
+
+export function getItemCount(inventory: Inventory, itemId: string) {
+  const item = findItem(inventory, itemId);
+  if (item) return item.count;
+  return 0;
+}
