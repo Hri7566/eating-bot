@@ -9,7 +9,7 @@ export class Bot {
   public cl: Client;
 
   constructor(public config: { channelId: string }) {
-    this.cl = new Client("wss://mppclone.com", env.MPPCLONE_TOKEN);
+    this.cl = new Client("wss://mppclone.com", env.MPPCLONE_TOKEN ?? "");
     bots.push(this);
 
     this.bindEventListeners();
@@ -41,7 +41,7 @@ export class Bot {
 
       let cmd = args[0].substring(usedPrefix.length);
 
-      // find command;
+      // Find command
       for (const command of commands) {
         for (const alias of command.aliases) {
           if (cmd == alias) {
@@ -58,9 +58,9 @@ export class Bot {
           {
             m: msg.m,
             a: msg.a,
-            args: args,
             p: msg.p,
             t: msg.t,
+            args,
             usedCommand,
             usedPrefix,
           },
